@@ -1,8 +1,6 @@
 package model;
-import java.math.*;
 import java.time.*;
 import java.util.Objects;
-import static util.IdGen.txGen;
 
 public class Transaction {
     private String id;

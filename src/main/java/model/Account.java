@@ -1,7 +1,7 @@
 package model;
 import java.math.BigDecimal;
 import java.util.Objects;
-import static util.IdGen.accGen;
+import static util.IdGen.genAccID;
 
 public class Account {
     private Long id;
@@ -9,7 +9,7 @@ public class Account {
 
     public Account() {
 
-        this.id = accGen();
+        this.id = genAccID();
         this.setBalance(BigDecimal.ZERO);
     }
 

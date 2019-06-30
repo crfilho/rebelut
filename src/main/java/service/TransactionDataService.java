@@ -26,6 +26,8 @@ public class TransactionDataService implements ITransactionDataService {
     @Override
     public Collection<Transaction> getAll (Account account) {
 
+        LOG.info("getTransactions for account {}", account);
+
         return transactionRepository.getAll(account.getId());
     }
 
@@ -36,10 +38,7 @@ public class TransactionDataService implements ITransactionDataService {
         Transaction t = new Transaction(TransactionType.DEPOSIT, sum, account.getId());
         transactionRepository.store(t);
 
-        synchronized (account) {
-            account.setBalance(account.getBalance().add(BigDecimal.valueOf(sum)));
-        }
-
+        account.setBalance(account.getBalance().add(BigDecimal.valueOf(sum)));
         return t;
     }
 
@@ -51,9 +50,7 @@ public class TransactionDataService implements ITransactionDataService {
         Transaction t = new Transaction(TransactionType.WITHDRAW, sum*-1, account.getId());
         transactionRepository.store(t);
 
-        synchronized (account) {
-            account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(sum)));
-        }
+        account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(sum)));
         return t;
     }
 
@@ -68,12 +65,8 @@ public class TransactionDataService implements ITransactionDataService {
         transactionRepository.store(in);
         transactionRepository.store(out);
 
-        synchronized (orig) {
-            synchronized (dest) {
-                orig.setBalance(orig.getBalance().add(BigDecimal.valueOf(sum)));
-                dest.setBalance(dest.getBalance().subtract(BigDecimal.valueOf(sum)));
-            }
-        }
+        orig.setBalance(orig.getBalance().add(BigDecimal.valueOf(sum)));
+        dest.setBalance(dest.getBalance().subtract(BigDecimal.valueOf(sum)));
         return out;
     }
 
