@@ -15,6 +15,7 @@ public class VolatileTransactionRepository implements ITransactionRepository {
 
     @Override
     public void store (Transaction transaction) {
+
         Collection<Transaction> transactions = TX_CACHE.containsKey(transaction.getAccountId())
                 ? TX_CACHE.get(transaction.getAccountId())
                 : new ArrayList<>();
@@ -25,7 +26,7 @@ public class VolatileTransactionRepository implements ITransactionRepository {
 
     @Override
     public Collection<Transaction> getAll(long accountid) {
-        // TODO sort?
+
         if (TX_CACHE.containsKey(accountid))
             return TX_CACHE.get(accountid);
         else

@@ -46,7 +46,6 @@ public class App {
                     path(":id", () -> {
                         get(accountController.get);
                         delete(accountController.delete);
-                        put(accountController.delete);
                     });
                     path(":accountid", () -> {
                         post("/deposit/:sum", transactionController.deposit);

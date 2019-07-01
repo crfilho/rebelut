@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.*;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,7 +34,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void depositTest() {
+    public void singleDepositTest() {
 
         Account a = new Account();
         when(accService.create()).thenReturn(a);
@@ -51,7 +52,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void withdrawTest() {
+    public void singleWithdrawTest() {
 
         Account a = new Account();
         when(accService.create()).thenReturn(a);
@@ -77,7 +78,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void transferTest() {
+    public void singleTransferTest() {
 
         Account from = new Account();
         Account to = new Account();
@@ -126,6 +127,46 @@ public class TransactionServiceTest {
         Account from = accService.create();
         Account to = accService.create();
         service.transfer(50.02d, from.getId(), to.getId());
+    }
+
+    @Test
+    public void multiTransactionTest() {
+
+        Account acc1 = new Account();
+        Account acc2 = new Account();
+        Account acc3 = new Account();
+
+        when(accService.get(acc1.getId())).thenReturn(acc1);
+        when(accService.get(acc2.getId())).thenReturn(acc2);
+        when(accService.get(acc3.getId())).thenReturn(acc3);
+
+        service.deposit(100.00d, acc1.getId());
+        service.transfer(40.00d, acc1.getId(), acc2.getId());
+        service.transfer(40.00d, acc1.getId(), acc3.getId());
+        service.withdraw(20.00d, acc2.getId());
+        service.withdraw(20.00d, acc3.getId());
+        assertEquals(BigDecimal.valueOf(20.00), acc1.getBalance());
+        assertEquals(BigDecimal.valueOf(20.00), acc2.getBalance());
+        assertEquals(BigDecimal.valueOf(20.00), acc3.getBalance());
+    }
+
+    @Test
+    public void transactionStoreTest() {
+
+        Account acc1 = new Account();
+        Account acc2 = new Account();
+
+        when(accService.get(acc1.getId())).thenReturn(acc1);
+        when(accService.get(acc2.getId())).thenReturn(acc2);
+
+        service.deposit(200.00d, acc1.getId());
+        verify(repoMock, times(1)).store(any());
+
+        service.transfer(100.00d, acc1.getId(), acc2.getId());
+        verify(repoMock, times(3)).store(any());
+
+        service.withdraw(50.00d, acc2.getId());
+        verify(repoMock, times(4)).store(any());
     }
 
     @After
