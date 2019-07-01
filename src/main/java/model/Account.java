@@ -10,7 +10,7 @@ public class Account {
     public Account() {
 
         this.id = genAccID();
-        this.setBalance(BigDecimal.ZERO);
+        this.balance = BigDecimal.ZERO;
     }
 
     public long getId() {
@@ -21,8 +21,13 @@ public class Account {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void sum(double amount) {
+        this.balance = balance.add(BigDecimal.valueOf(amount));
+    }
+
+    public void subtract(double amount) {
+
+        this.balance = balance.subtract(BigDecimal.valueOf(amount));
     }
 
     @Override

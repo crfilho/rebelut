@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 public class AccountDataService implements IAccountDataService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AccountDataService.class);
-    private static final ConcurrentHashMap<Long, Account> CACHE = new ConcurrentHashMap<>();
+    private final Logger LOG = LoggerFactory.getLogger(AccountDataService.class);
+    private final ConcurrentHashMap<Long, Account> CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Account get(long id) {
