@@ -24,11 +24,12 @@ public class TransactionDataService implements ITransactionDataService {
     }
 
     @Override
-    public Collection<Transaction> getAll (long accountid) {
+    public Collection<Transaction> getAll (long accountid) throws RuntimeException {
 
         LOG.info("getTransactions for account {}", accountid);
+        Account account = accountService.get(accountid);
 
-        Account a = accountService.get(accountid);
+        if (account == null) throw new RuntimeException("Invalid account");
         return transactionRepository.getAll(accountid);
     }
 
@@ -44,6 +45,7 @@ public class TransactionDataService implements ITransactionDataService {
 
         account.sum(amount);
         accountService.update(account);
+        t.setStatus(1);
         return t;
     }
 
@@ -62,11 +64,12 @@ public class TransactionDataService implements ITransactionDataService {
         account.subtract(amount);
         accountService.update(account);
 
+        t.setStatus(1);
         return t;
     }
 
     @Override
-    public synchronized Transaction transfer (double amount, long from, long to) throws RuntimeException {
+    public synchronized Transaction[] transfer (double amount, long from, long to) throws RuntimeException {
 
         LOG.info("transfer {} from {} to {}", amount, from, to);
 
@@ -76,8 +79,8 @@ public class TransactionDataService implements ITransactionDataService {
         if (orig == null || dest == null || orig == dest) throw new RuntimeException("Invalid transaction");
         if (orig.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0) throw new RuntimeException("Insufficient funds");
 
-        Transaction in = new Transaction(TransactionType.TRANSFER_IN, amount, from);
-        Transaction out = new Transaction(TransactionType.TRANSFER_OUT, amount * -1, to);
+        Transaction in = new Transaction(TransactionType.TRANSFER_IN, amount * -1, from);
+        Transaction out = new Transaction(TransactionType.TRANSFER_OUT, amount, to);
         transactionRepository.store(in);
         transactionRepository.store(out);
 
@@ -85,13 +88,15 @@ public class TransactionDataService implements ITransactionDataService {
 
             orig.subtract(amount);
             accountService.update(orig);
+            out.setStatus(1);
         }
         synchronized(dest) {
 
             dest.sum(amount);
             accountService.update(dest);
+            in.setStatus(1);
         }
-        return out;
+        return new Transaction[] {in, out};
     }
 
     private Block process(Transaction tx) {

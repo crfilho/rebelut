@@ -1,6 +1,7 @@
 package model;
 import java.time.*;
 import java.util.Objects;
+import static util.IdGen.genTxID;
 
 public class Transaction {
     private String id;
@@ -12,7 +13,7 @@ public class Transaction {
 
     public Transaction(TransactionType txType, double sum, long accountid) {
 
-        //this.id = gen();
+        this.id = genTxID();
         this.accountid = accountid;
         this.time = Instant.now();
         this.sum = sum;

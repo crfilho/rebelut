@@ -16,19 +16,27 @@ public class TransactionController {
     }
 
     public Handler deposit = ctx -> {
+        try {
+            long accountid = Long.valueOf(ctx.pathParam("accountid"));
+            double sum = ctx.pathParam("sum", double.class).check(it -> it > 0).get();
 
-        long accountid = Long.valueOf(ctx.pathParam("accountid"));
-        double sum = ctx.pathParam("sum", double.class).check(it -> it > 0).get();
-
-        ctx.json(transactionService.deposit(sum, accountid));
+            ctx.json(transactionService.deposit(sum, accountid));
+        }
+        catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 
     public Handler withdraw = ctx -> {
+        try {
+            long accountid = Long.valueOf(ctx.pathParam("accountid"));
+            double sum = ctx.pathParam("sum", double.class).check(it -> it > 0).get();
 
-        long accountid = Long.valueOf(ctx.pathParam("accountid"));
-        double sum = ctx.pathParam("sum", double.class).check(it -> it > 0).get();
-
-        ctx.json(transactionService.withdraw(sum, accountid));
+            ctx.json(transactionService.withdraw(sum, accountid));
+        }
+        catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 
     public Handler transfer = ctx -> {
@@ -38,12 +46,12 @@ public class TransactionController {
             long to = Long.valueOf(ctx.formParam("to"));
             double sum = ctx.formParam("sum", double.class).check(it -> it > 0).get();
 
-            Transaction t = transactionService.transfer(sum, from, to);
-            if (t.getStatus() < 0) ctx.status(403).json(t);
-            else ctx.status(200).json(t);
+            Transaction[] tx = transactionService.transfer(sum, from, to);
+            if (tx[0].getStatus() < 0 || tx[1].getStatus() < 0) ctx.status(403).json(tx);
+            else ctx.status(200).json(tx);
         }
         catch(Exception e) {
-            ctx.status(400).json(e);
+            ctx.status(400).json(e.getMessage());
         }
     };
 
