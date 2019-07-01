@@ -32,11 +32,11 @@ public class App {
         JavalinJson.setToJsonMapper(gson::toJson);
         Javalin app = Javalin.create().start(port);
 
-        AccountDataService accountDataService = new AccountDataService();
+        IAccountDataService accountDataService = new AccountDataService();
         AccountController accountController = new AccountController(accountDataService);
 
-        ITransactionDataService transactionService = new TransactionDataService(new VolatileTransactionRepository());
-        TransactionController transactionController = new TransactionController(transactionService, accountDataService);
+        ITransactionDataService transactionService = new TransactionDataService(new VolatileTransactionRepository(), accountDataService);
+        TransactionController transactionController = new TransactionController(transactionService);
 
         app.routes(() -> {
             path(endpoint, () -> {

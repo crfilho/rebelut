@@ -4,8 +4,8 @@ import model.Transaction;
 import java.util.Collection;
 
 public interface ITransactionDataService {
-    Collection<Transaction> getAll (Account account);
-    Transaction transfer (double sum, Account orig, Account dest);
-    Transaction deposit (double sum, Account accountid);
-    Transaction withdraw (double sum, Account accountid);
+    Collection<Transaction> getAll (long account);
+    Transaction transfer (double amount, long from, long to);
+    Transaction deposit (double amount, long accountid);
+    Transaction withdraw (double amount, long accountid);
 }
