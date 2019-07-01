@@ -1,6 +1,7 @@
 package model;
 import java.time.Instant;
 import java.util.Objects;
+
 import static util.IdGen.genTxID;
 
 public class Transaction {
@@ -54,7 +55,7 @@ public class Transaction {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
+        if (o == null || !(o instanceof Transaction))
             return false;
 
         Transaction that = (Transaction) o;

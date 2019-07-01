@@ -1,13 +1,13 @@
 package service;
+import data.ITransactionRepository;
 import model.Account;
-import model.Block;
 import model.Transaction;
 import model.TransactionType;
-import data.ITransactionRepository;
-import java.math.BigDecimal;
-import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.util.Collection;
 
 public class TransactionDataService implements ITransactionDataService {
 
@@ -36,14 +36,16 @@ public class TransactionDataService implements ITransactionDataService {
         LOG.info("deposit {} into account {}", amount, accountid);
         Account account = accountService.get(accountid);
 
-        if (account == null) throw new RuntimeException("Invalid account");
-        Transaction t = new Transaction(TransactionType.DEPOSIT, amount, accountid);
-        transactionRepository.store(t);
+        if (account == null)
+            throw new RuntimeException("Invalid account");
+
+        Transaction transaction = new Transaction(TransactionType.DEPOSIT, amount, accountid);
+        transactionRepository.store(transaction);
 
         account.sum(amount);
         accountService.update(account);
-        t.setStatus(1);
-        return t;
+        transaction.setStatus(1);
+        return transaction;
     }
 
     @Override
@@ -52,8 +54,10 @@ public class TransactionDataService implements ITransactionDataService {
         LOG.info("withdraw {} from account {}", amount, accountid);
         Account account = accountService.get(accountid);
 
-        if (account == null) throw new RuntimeException("Invalid account");
-        if (account.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0) throw new RuntimeException("Insufficient funds");
+        if (account == null)
+            throw new RuntimeException("Invalid account");
+        if (account.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0)
+            throw new RuntimeException("Insufficient funds");
 
         Transaction t = new Transaction(TransactionType.WITHDRAW, amount*-1, account.getId());
         transactionRepository.store(t);
@@ -73,8 +77,11 @@ public class TransactionDataService implements ITransactionDataService {
         Account orig = accountService.get(from);
         Account dest = accountService.get(to);
 
-        if (orig == null || dest == null || orig == dest) throw new RuntimeException("Invalid transaction");
-        if (orig.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0) throw new RuntimeException("Insufficient funds");
+        if (orig == null || dest == null || orig == dest)
+            throw new RuntimeException("Invalid transaction");
+
+        if (orig.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0)
+            throw new RuntimeException("Insufficient funds");
 
         Transaction in = new Transaction(TransactionType.TRANSFER_IN, amount * -1, from);
         Transaction out = new Transaction(TransactionType.TRANSFER_OUT, amount, to);
@@ -94,16 +101,5 @@ public class TransactionDataService implements ITransactionDataService {
             in.setStatus(1);
         }
         return new Transaction[] {in, out};
-    }
-
-    private Block process(Transaction tx) {
-        /*// TODO validate balance ?
-        Block top = chain.get(accountId);
-        Block incoming = new Block(top, sum);
-
-        chain.put(accountId, incoming);
-
-        return chain.get(accountId);*/
-        return null;
     }
 }

@@ -33,11 +33,16 @@ public class Account {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
+        if (o == null || !(o instanceof Account))
             return false;
 
         Account that = (Account) o;
         return Objects.equals(this.getId(), that.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return 31 * 17 + id.hashCode();
     }
 
     @Override

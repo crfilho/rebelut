@@ -1,5 +1,4 @@
 package data;
-import model.Block;
 import model.Transaction;
 
 import java.util.ArrayList;
@@ -8,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class VolatileTransactionRepository implements ITransactionRepository {
 
-    private static final ConcurrentHashMap<Long, Block> CHAIN = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
+     private static final ConcurrentHashMap<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public void store (Transaction transaction) {

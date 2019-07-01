@@ -20,6 +20,12 @@ jar {
     version = version
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
 repositories {
     mavenCentral()
 }
