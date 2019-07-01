@@ -76,6 +76,58 @@ public class TransactionServiceTest {
         service.withdraw(50.02d, a.getId());
     }
 
+    @Test
+    public void transferTest() {
+
+        Account from = new Account();
+        Account to = new Account();
+
+        when(accService.get(from.getId())).thenReturn(from);
+        when(accService.get(to.getId())).thenReturn(to);
+
+        service.deposit(200.00d, from.getId());
+        service.transfer(50.00d, from.getId(), to.getId());
+        assertEquals(BigDecimal.valueOf(150.00), from.getBalance());
+        assertEquals(BigDecimal.valueOf(50.00), to.getBalance());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void rejectTransferInvalidDestAccountTest() {
+
+        Account orig = new Account();
+        when(accService.get(orig.getId())).thenReturn(orig);
+
+        service.transfer(250.01d, orig.getId(), 1040L);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void rejectTransferInvalidOrigAccountTest() {
+
+        Account dest = new Account();
+        when(accService.get(dest.getId())).thenReturn(dest);
+
+        service.transfer(250.01d, 1030L, dest.getId());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void rejectTransferInvalidAmountTest() {
+
+        Account dest = new Account();
+        Account orig = new Account();
+        when(accService.get(dest.getId())).thenReturn(dest);
+        when(accService.get(orig.getId())).thenReturn(orig);
+
+        service.transfer(250.00d, orig.getId(), dest.getId());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void rejectTransferInsufficientFunds() {
+
+        Account from = accService.create();
+        Account to = accService.create();
+        service.transfer(50.02d, from.getId(), to.getId());
+    }
+
     @After
     public void tearDown() {
         accService = null;

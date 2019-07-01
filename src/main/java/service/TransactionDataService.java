@@ -76,19 +76,19 @@ public class TransactionDataService implements ITransactionDataService {
         if (orig == null || dest == null || orig == dest) throw new RuntimeException("Invalid transaction");
         if (orig.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0) throw new RuntimeException("Insufficient funds");
 
-        Transaction in = new Transaction(TransactionType.TRANSFER_OUT, amount, from);
-        Transaction out = new Transaction(TransactionType.TRANSFER_IN, amount * -1, to);
+        Transaction in = new Transaction(TransactionType.TRANSFER_IN, amount, from);
+        Transaction out = new Transaction(TransactionType.TRANSFER_OUT, amount * -1, to);
         transactionRepository.store(in);
         transactionRepository.store(out);
 
         synchronized(orig) {
 
-            orig.sum(amount);
+            orig.subtract(amount);
             accountService.update(orig);
         }
         synchronized(dest) {
 
-            dest.subtract(amount);
+            dest.sum(amount);
             accountService.update(dest);
         }
         return out;
