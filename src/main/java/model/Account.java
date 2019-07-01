@@ -1,6 +1,7 @@
 package model;
 import java.math.BigDecimal;
 import java.util.Objects;
+
 import static util.IdGen.genAccID;
 
 public class Account {

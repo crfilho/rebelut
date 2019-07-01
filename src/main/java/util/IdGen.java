@@ -1,6 +1,6 @@
 package util;
-import java.util.Random;
 import java.util.UUID;
+import java.util.Random;
 
 public class IdGen {
     private IdGen() { }

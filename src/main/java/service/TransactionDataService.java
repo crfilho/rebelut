@@ -6,9 +6,6 @@ import model.TransactionType;
 import data.ITransactionRepository;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

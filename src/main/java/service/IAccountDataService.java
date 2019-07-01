@@ -1,7 +1,6 @@
 package service;
-
-import java.util.Collection;
 import model.Account;
+import java.util.Collection;
 
 public interface IAccountDataService {
 

@@ -3,8 +3,6 @@ import model.Block;
 import model.Transaction;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 

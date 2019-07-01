@@ -1,7 +1,7 @@
 package model;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
+import java.lang.reflect.Array;
 
 public class Block {
     private int blockHash;
