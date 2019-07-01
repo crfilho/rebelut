@@ -1,42 +1,42 @@
 
 ## Rebelut 1.0
 
-**Build**
+**Build**<br/>
 gradle buildit
 
-**Test**
+**Test**<br/>
 gradle test
 
-**Run**
+**Run**<br/>
 java -jar build\\libs\\rebelut-1.0.jar
 
-**API endpoint**
+**API endpoint**<br/>
 http://localhost:8181/api/v1/
 
-*Create new account*
+*Create new account*<br/>
 curl -X POST http://localhost:8181/api/v1//accounts
 
-*Get account*
+*Get account*<br/>
 curl http://localhost:8181/api/v1/accounts/:id
 
-*Get statements*
+*Get statements*<br/>
 curl http://localhost:8181/api/v1/accounts/:id/statements
 
- *Get all accounts*
+ *Get all accounts*<br/>
 curl http://localhost:8181/api/v1/accounts/
 
-*Delete account*
+*Delete account*<br/>
 curl -X DELETE http://localhost:8181/api/v1/accounts/:id
 
-*Deposit*
+*Deposit*<br/>
 curl -X POST http://localhost:8181/api/v1/accounts/:id/deposit/:amount
 
-*Withdraw*
+*Withdraw*<br/>
 curl -X POST http://localhost:8181/api/v1/accounts/:id/:withdraw/:amount
 
-*Deposit*
+*Deposit*<br/>
 **POST** /accounts/:id/deposit/:amount
 curl -X POST http://localhost:8181/api/v1/accounts/:id/deposit/:amount
 
-*Transfer*
+*Transfer*<br/>
 curl -X POST http://localhost:8181/api/v1/transactions/send -d "sum=:amount&from=:orig&to=:dest"
