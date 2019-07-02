@@ -13,11 +13,13 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should execute single deposit request on #account.id"() {
-        when:
 
+        given:
         def account = new Account()
         accServiceMock.create() >> account
         accServiceMock.get(_) >> account
+
+        when:
         transactionService.deposit(100.01d, account.id)
 
         then:
@@ -26,6 +28,7 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject deposit because account is invalid"() {
+
         when:
         transactionService.deposit(100.01d, 1020L);
 
@@ -37,11 +40,13 @@ public class TransactionServiceTest extends Specification {
     @Unroll
     def "should execute single withdraw request on #account.id"() {
 
-        when:
+        given:
         def account = new Account()
         account.balance = 100.01d
         accServiceMock.create() >> account
         accServiceMock.get(_) >> account
+
+        when:
         transactionService.withdraw(20.00d, account.id)
 
         then:
@@ -50,6 +55,7 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject withdraw because account is invalid"() {
+
         when:
         transactionService.withdraw(50.01d, 1030L)
 
@@ -60,8 +66,10 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject withdraw because of insufficient funds"() {
-        when:
+        given:
         accServiceMock.get(_) >> new Account()
+
+        when:
         transactionService.withdraw(50.01d, 1030L)
 
         then:
@@ -71,11 +79,13 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should execute single transfer request between accounts"() {
-        when:
+        given:
         def from = new Account()
         def to = new Account()
         accServiceMock.get(from.id) >> from
         accServiceMock.get(to.id) >> to
+
+        when:
         transactionService.deposit(200.00d, from.id)
         transactionService.transfer(50.00d, from.id, to.id)
 
@@ -86,9 +96,12 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject single transfer because invalid destination account"() {
-        when:
+
+        given:
         def from = new Account()
         accServiceMock.get(from.id) >> from
+
+        when:
         transactionService.deposit(200.00d, from.id);
         transactionService.transfer(50.00d, from.id, 1040L);
 
@@ -99,9 +112,12 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject single transfer because invalid origin account"() {
-        when:
+
+        given:
         def to = new Account()
         accServiceMock.get(to.id) >> to
+
+        when:
         transactionService.transfer(50.00d, 1050L, to.id);
 
         then:
@@ -111,11 +127,14 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject single transfer because invalid amount"() {
-        when:
+
+        given:
         def from = new Account()
         def to = new Account()
         accServiceMock.get(from.id) >> from
         accServiceMock.get(to.id) >> to
+
+        when:
         transactionService.transfer(0d, from.id, to.id);
 
         then:
@@ -125,11 +144,14 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject single transfer because insufficient funds"() {
-        when:
+
+        given:
         def from = new Account()
         def to = new Account()
         accServiceMock.get(from.id) >> from
         accServiceMock.get(to.id) >> to
+
+        when:
         transactionService.transfer(250.00d, from.id, to.id);
 
         then:
@@ -139,9 +161,12 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should reject single transfer because destination == origin"() {
-        when:
+
+        given:
         def acc = new Account()
         accServiceMock.get(acc.id) >> acc
+
+        when:
         transactionService.transfer(150.00d, acc.id, acc.id);
 
         then:
@@ -151,13 +176,16 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should execute single transfer request between accounts"() {
-        when:
+
+        given:
         def acc1 = new Account()
         def acc2 = new Account()
         def acc3 = new Account()
         accServiceMock.get(acc1.id) >> acc1
         accServiceMock.get(acc2.id) >> acc2
         accServiceMock.get(acc3.id) >> acc3
+
+        when:
         transactionService.deposit(100.00d, acc1.id);
         transactionService.transfer(40.00d, acc1.id, acc2.id);
         transactionService.transfer(40.00d, acc1.id, acc3.id);
@@ -172,15 +200,16 @@ public class TransactionServiceTest extends Specification {
 
     @Unroll
     def "should store transactions into repo"() {
-        when:
+
+        given:
         def acc1 = new Account()
         def acc2 = new Account()
         def acc3 = new Account()
-
         accServiceMock.get(acc1.id) >> acc1
         accServiceMock.get(acc2.id) >> acc2
         accServiceMock.get(acc3.id) >> acc3
 
+        when:
         transactionService.deposit(200.00d, acc1.id)
         transactionService.transfer(100.00d, acc1.id, acc2.id)
         transactionService.withdraw(50.00d, acc2.id)

@@ -36,6 +36,9 @@ public class TransactionDataService implements ITransactionDataService {
         LOG.info("deposit {} into account {}", amount, accountid);
         Account account = accountService.get(accountid);
 
+        if (amount <= 0)
+            throw new RuntimeException("Invalid amount");
+
         if (account == null)
             throw new RuntimeException("Invalid account");
 
@@ -56,6 +59,10 @@ public class TransactionDataService implements ITransactionDataService {
 
         if (account == null)
             throw new RuntimeException("Invalid account");
+
+        if (amount <= 0)
+            throw new RuntimeException("Invalid amount");
+
         if (account.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0)
             throw new RuntimeException("Insufficient funds");
 
@@ -76,6 +83,9 @@ public class TransactionDataService implements ITransactionDataService {
 
         Account orig = accountService.get(from);
         Account dest = accountService.get(to);
+
+        if (amount <= 0)
+            throw new RuntimeException("Invalid amount");
 
         if (orig == null || dest == null || orig == dest)
             throw new RuntimeException("Invalid transaction");

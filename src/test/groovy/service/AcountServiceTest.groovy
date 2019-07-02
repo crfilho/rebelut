@@ -39,10 +39,12 @@ class AcountServiceTest extends Specification {
     @Unroll
     def "should update the balance gor a given account"() {
 
-        when:
+        given:
         def acc = accountService.create()
         acc.sum(15.01)
         acc.subtract(0.01)
+
+        when:
         accountService.update(acc)
 
         then:
