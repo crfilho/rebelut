@@ -4,9 +4,10 @@ import java.util.Collection;
 
 public interface IAccountDataService {
 
-    Account create ();
-    void delete (long id);
-    void update (Account account);
     Account get(long id);
     Collection<Account> getAll();
+    Account create ();
+    void credit (double amount, Account account);
+    void debit (double amount, Account account);
+    void delete (long id);
 }

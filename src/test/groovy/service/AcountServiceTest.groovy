@@ -1,29 +1,32 @@
 package service
 
+import data.IAccountRepository
 import spock.lang.Unroll
 import spock.lang.Specification
 
-class AcountServiceTest extends Specification {
+public class AcountServiceTest extends Specification {
 
-    def accountService = new AccountDataService()
+    def accountRepoMock = Mock(IAccountRepository);
+    def accountService = new AccountDataService(accountRepoMock)
 
     @Unroll
-    def "should create account and cache it"() {
+    def "should create account and persist it"() {
         when:
-        def acc = accountService.create()
+        def account = accountService.create()
 
         then:
-        accountService.get(acc.id) == acc
+        1 * accountRepoMock.create(_)
     }
 
     @Unroll
-    def "should create multiple ccounts with unique id"() {
+    def "should create multiple accounts with unique id"() {
         when:
         def acc1 = accountService.create()
         def acc2 = accountService.create()
         def acc3 = accountService.create()
 
         then:
+        3 * accountRepoMock.create(_)
         acc1.id != acc2.id != acc3.id
     }
 
@@ -33,34 +36,53 @@ class AcountServiceTest extends Specification {
         def acc = accountService.create()
 
         then:
-        accountService.get(acc.id).balance == 0
+        acc.balance == 0
     }
 
     @Unroll
-    def "should update the balance gor a given account"() {
+    def "should update the balance when credit into a given account"() {
 
         given:
         def acc = accountService.create()
-        acc.sum(15.01)
-        acc.subtract(0.01)
 
         when:
-        accountService.update(acc)
+        accountService.credit(15.01, acc)
 
         then:
-        15.00 == accountService.get(acc.id).balance
+        1 * accountRepoMock.update(acc)
+    }
+
+    @Unroll
+    def "should update the balance when debit into a given account"() {
+
+        given:
+        def acc = accountService.create()
+
+        when:
+        accountService.debit(1000.00d, acc)
+
+        then:
+        1 * accountRepoMock.update(acc)
+    }
+
+    @Unroll
+    def "should delete a given account from repo"() {
+
+        when:
+        accountService.delete(1234)
+
+        then:
+        1 * accountRepoMock.delete(1234)
     }
 
     @Unroll
     def "should retrieve all available accounts"() {
 
         when:
-        accountService.create()
-        accountService.create()
-        accountService.create()
+        accountService.getAll()
 
         then:
-        3 == accountService.getAll().size();
+        1 * accountRepoMock.getAll()
     }
 
 }
