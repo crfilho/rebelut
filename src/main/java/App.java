@@ -1,21 +1,20 @@
 import controller.AccountController;
 import controller.TransactionController;
-import data.InMemoryAccountRepository;
+import data.InMemoryRepository;
 import service.AccountDataService;
 import service.IAccountDataService;
 import service.ITransactionDataService;
 import service.TransactionDataService;
-import data.InMemoryTransactionRepository;
 import validator.BasicTransactionValidator;
 
 public class App {
 
     public static void main(String[] args) {
 
-        IAccountDataService accountDataService = new AccountDataService(new InMemoryAccountRepository());
+        IAccountDataService accountDataService = new AccountDataService(InMemoryRepository.instance());
         AccountController accountController = new AccountController(accountDataService);
 
-        ITransactionDataService transactionService = new TransactionDataService(new BasicTransactionValidator(), new InMemoryTransactionRepository(), accountDataService);
+        ITransactionDataService transactionService = new TransactionDataService(new BasicTransactionValidator(), InMemoryRepository.instance(), accountDataService);
         TransactionController transactionController = new TransactionController(transactionService);
 
         new RestAPI(accountController, transactionController).start();
