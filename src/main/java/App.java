@@ -1,6 +1,5 @@
 import controller.AccountController;
 import controller.TransactionController;
-import data.IAccountRepository;
 import data.InMemoryAccountRepository;
 import service.AccountDataService;
 import service.IAccountDataService;
@@ -19,6 +18,6 @@ public class App {
         ITransactionDataService transactionService = new TransactionDataService(new BasicTransactionValidator(), new InMemoryTransactionRepository(), accountDataService);
         TransactionController transactionController = new TransactionController(transactionService);
 
-        new RestApi(accountController, transactionController).start();
+        new RestAPI(accountController, transactionController).start();
     }
 }

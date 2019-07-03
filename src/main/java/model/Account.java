@@ -27,7 +27,7 @@ public class Account {
 
     public void sum(double amount) {
 
-        while(true) {
+        while (true) {
             BigDecimal currentBalance = balance.get();
             if (balance.compareAndSet(currentBalance, currentBalance.add(BigDecimal.valueOf(amount))))
                 return;
@@ -36,7 +36,7 @@ public class Account {
 
     public void subtract(double amount) {
 
-        while(true) {
+        while (true) {
             BigDecimal currentBalance = balance.get();
             if (balance.compareAndSet(currentBalance, currentBalance.subtract(BigDecimal.valueOf(amount))))
                 return;

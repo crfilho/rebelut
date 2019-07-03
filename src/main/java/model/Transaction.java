@@ -71,14 +71,19 @@ public class Transaction {
         return Objects.hash(getAccount().getId(), getSum(), getTime());
     }
 
-    public boolean isWithdraw() { return this.txType.equals(TransactionType.WITHDRAW); }
+    public boolean isWithdraw() {
+        return this.txType.equals(TransactionType.WITHDRAW);
+    }
 
     public boolean isDeposit() {
-        return this.txType.equals(TransactionType.DEPOSIT); }
+        return this.txType.equals(TransactionType.DEPOSIT);
+    }
 
     public boolean isTransferIn() {
-        return this.txType.equals(TransactionType.TRANSFER_IN); }
+        return this.txType.equals(TransactionType.TRANSFER_IN);
+    }
 
     public boolean isTransferOut() {
-        return this.txType.equals(TransactionType.TRANSFER_OUT); }
+        return this.txType.equals(TransactionType.TRANSFER_OUT);
+    }
 }

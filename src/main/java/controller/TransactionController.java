@@ -57,7 +57,12 @@ public class TransactionController {
 
     public Handler getTransactions = ctx -> {
 
-        long accountid = Long.valueOf(ctx.pathParam("accountid"));
-        ctx.json(transactionService.getAll(accountid));
+        try {
+            long accountid = Long.valueOf(ctx.pathParam("accountid"));
+            ctx.json(transactionService.getAll(accountid));
+        }
+        catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 }

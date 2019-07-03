@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryTransactionRepository implements ITransactionRepository {
 
-     private static final ConcurrentHashMap<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public void store (Transaction transaction) {

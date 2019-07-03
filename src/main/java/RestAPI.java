@@ -13,7 +13,7 @@ import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.apibuilder.ApiBuilder.delete;
 import static io.javalin.apibuilder.ApiBuilder.after;
 
-public class RestApi {
+public class RestAPI {
 
     private static String endpoint = "/api/v1/";
     private static int port = 8181;
@@ -23,7 +23,7 @@ public class RestApi {
     private AccountController accountController;
     private TransactionController transactionController;
 
-    public RestApi(AccountController accountController, TransactionController transactionController) {
+    public RestAPI(AccountController accountController, TransactionController transactionController) {
         this.accountController = accountController;
         this.transactionController = transactionController;
     }

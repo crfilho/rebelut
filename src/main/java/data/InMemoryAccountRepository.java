@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryAccountRepository implements IAccountRepository {
 
-    private final ConcurrentHashMap<Long, Account> CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Account> CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Account get(long id) {
