@@ -1,17 +1,20 @@
 package model;
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static util.IdGen.genAccID;
 
 public class Account {
+
     private Long id;
-    private volatile BigDecimal balance;
+    private AtomicReference<BigDecimal> balance;
 
     public Account() {
 
         this.id = genAccID();
-        this.balance = BigDecimal.ZERO;
+        this.balance = new AtomicReference<>();
+        this.balance.set(BigDecimal.ZERO);
     }
 
     public long getId() {
@@ -19,16 +22,25 @@ public class Account {
     }
 
     public BigDecimal getBalance() {
-        return balance;
+        return balance.get();
     }
 
     public void sum(double amount) {
-        this.balance = balance.add(BigDecimal.valueOf(amount));
+
+        while(true) {
+            BigDecimal currentBalance = balance.get();
+            if (balance.compareAndSet(currentBalance, currentBalance.add(BigDecimal.valueOf(amount))))
+                return;
+        }
     }
 
     public void subtract(double amount) {
 
-        this.balance = balance.subtract(BigDecimal.valueOf(amount));
+        while(true) {
+            BigDecimal currentBalance = balance.get();
+            if (balance.compareAndSet(currentBalance, currentBalance.subtract(BigDecimal.valueOf(amount))))
+                return;
+        }
     }
 
     @Override

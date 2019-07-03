@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class VolatileTransactionRepository implements ITransactionRepository {
+public class InMemoryTransactionRepository implements ITransactionRepository {
 
      private static final ConcurrentHashMap<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public void store (Transaction transaction) {
 
-        Collection<Transaction> transactions = TX_CACHE.containsKey(transaction.getAccountId())
-                ? TX_CACHE.get(transaction.getAccountId())
+        Collection<Transaction> transactions = TX_CACHE.containsKey(transaction.getAccount().getId())
+                ? TX_CACHE.get(transaction.getAccount().getId())
                 : new ArrayList<>();
 
         transactions.add(transaction);
-        TX_CACHE.put(transaction.getAccountId(), transactions);
+        TX_CACHE.put(transaction.getAccount().getId(), transactions);
     }
 
     @Override

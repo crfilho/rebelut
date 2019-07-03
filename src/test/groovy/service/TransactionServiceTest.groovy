@@ -4,15 +4,18 @@ import model.Account
 import data.ITransactionRepository
 import spock.lang.Unroll
 import spock.lang.Specification
+import validator.ITransactionValidator
+import validator.InvalidTransactionException
 
 public class TransactionServiceTest extends Specification {
 
     def txRepositoryMock = Mock(ITransactionRepository)
     def accServiceMock = Mock(IAccountDataService)
-    def transactionService = new TransactionDataService(txRepositoryMock, accServiceMock)
+    def txValidatorMock = Mock(ITransactionValidator)
+    def transactionService = new TransactionDataService(txValidatorMock, txRepositoryMock, accServiceMock)
 
     @Unroll
-    def "should execute single deposit request on #account.id"() {
+    def "should process single deposit request"() {
 
         given:
         def account = new Account()
@@ -23,62 +26,26 @@ public class TransactionServiceTest extends Specification {
         transactionService.deposit(100.01d, account.id)
 
         then:
-        account.balance == 100.01d
+        1 * accServiceMock.credit(100.01,_)
     }
 
     @Unroll
-    def "should reject deposit because account is invalid"() {
-
-        when:
-        transactionService.deposit(100.01d, 1020L);
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Invalid account'
-    }
-
-    @Unroll
-    def "should execute single withdraw request on #account.id"() {
+    def "should process single withdraw request"() {
 
         given:
         def account = new Account()
-        account.balance = 100.01d
-        accServiceMock.create() >> account
-        accServiceMock.get(_) >> account
+        account.sum(100.01d)
+        accServiceMock.get(account.id) >> account
 
         when:
         transactionService.withdraw(20.00d, account.id)
 
         then:
-        account.balance == 80.01d;
+        1 * accServiceMock.debit(20.00d,_)
     }
 
     @Unroll
-    def "should reject withdraw because account is invalid"() {
-
-        when:
-        transactionService.withdraw(50.01d, 1030L)
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Invalid account'
-    }
-
-    @Unroll
-    def "should reject withdraw because of insufficient funds"() {
-        given:
-        accServiceMock.get(_) >> new Account()
-
-        when:
-        transactionService.withdraw(50.01d, 1030L)
-
-        then:
-        def e = thrown(RuntimeException )
-        e.message == 'Insufficient funds'
-    }
-
-    @Unroll
-    def "should execute single transfer request between accounts"() {
+    def "should process single transfer request between accounts"() {
         given:
         def from = new Account()
         def to = new Account()
@@ -90,92 +57,13 @@ public class TransactionServiceTest extends Specification {
         transactionService.transfer(50.00d, from.id, to.id)
 
         then:
-        from.balance == 150.00
-        to.balance == 50.00
+        1 * accServiceMock.credit(200.00d,from)
+        1 * accServiceMock.debit(50.00d,from)
+        1 * accServiceMock.credit(50.00d,to)
     }
 
     @Unroll
-    def "should reject single transfer because invalid destination account"() {
-
-        given:
-        def from = new Account()
-        accServiceMock.get(from.id) >> from
-
-        when:
-        transactionService.deposit(200.00d, from.id);
-        transactionService.transfer(50.00d, from.id, 1040L);
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Invalid transaction'
-    }
-
-    @Unroll
-    def "should reject single transfer because invalid origin account"() {
-
-        given:
-        def to = new Account()
-        accServiceMock.get(to.id) >> to
-
-        when:
-        transactionService.transfer(50.00d, 1050L, to.id);
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Invalid transaction'
-    }
-
-    @Unroll
-    def "should reject single transfer because invalid amount"() {
-
-        given:
-        def from = new Account()
-        def to = new Account()
-        accServiceMock.get(from.id) >> from
-        accServiceMock.get(to.id) >> to
-
-        when:
-        transactionService.transfer(0d, from.id, to.id);
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Invalid amount'
-    }
-
-    @Unroll
-    def "should reject single transfer because insufficient funds"() {
-
-        given:
-        def from = new Account()
-        def to = new Account()
-        accServiceMock.get(from.id) >> from
-        accServiceMock.get(to.id) >> to
-
-        when:
-        transactionService.transfer(250.00d, from.id, to.id);
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Insufficient funds'
-    }
-
-    @Unroll
-    def "should reject single transfer because destination == origin"() {
-
-        given:
-        def acc = new Account()
-        accServiceMock.get(acc.id) >> acc
-
-        when:
-        transactionService.transfer(150.00d, acc.id, acc.id);
-
-        then:
-        def e = thrown(RuntimeException)
-        e.message == 'Invalid transaction'
-    }
-
-    @Unroll
-    def "should execute single transfer request between accounts"() {
+    def "should execute multiple transactions between accounts"() {
 
         given:
         def acc1 = new Account()
@@ -193,9 +81,10 @@ public class TransactionServiceTest extends Specification {
         transactionService.withdraw(20.00d, acc3.id);
         
         then:
-        acc1.balance == 20.00d
-        acc2.balance == 20.00d
-        acc3.balance == 20.00d
+        1 * accServiceMock.credit(100.00d,acc1)
+        2 * accServiceMock.debit(40.00d,acc1)
+        1 * accServiceMock.debit(20.00d,acc2)
+        1 * accServiceMock.debit(20.00d,acc3)
     }
 
     @Unroll

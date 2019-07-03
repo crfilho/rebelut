@@ -5,17 +5,26 @@ import model.Transaction;
 import model.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import validator.ITransactionValidator;
+import validator.InvalidTransactionException;
+import validator.TransactionErrorMessage;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 
 public class TransactionDataService implements ITransactionDataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionDataService.class);
+    private ITransactionValidator transactionValidator;
     private ITransactionRepository transactionRepository;
     private IAccountDataService accountService;
 
-    public TransactionDataService(ITransactionRepository transactionRepository, IAccountDataService accountService) {
+    private TransactionDataService() { }
+
+    public TransactionDataService(ITransactionValidator transactionValidator,
+                                  ITransactionRepository transactionRepository,
+                                  IAccountDataService accountService) {
+
+        this.transactionValidator = transactionValidator;
         this.transactionRepository = transactionRepository;
         this.accountService = accountService;
     }
@@ -26,90 +35,67 @@ public class TransactionDataService implements ITransactionDataService {
         LOG.info("getTransactions for account {}", accountid);
         Account account = accountService.get(accountid);
 
-        if (account == null) throw new RuntimeException("Invalid account");
+        if (account == null)
+            throw new InvalidTransactionException(TransactionErrorMessage.INVALID_ACCOUNT);
+
         return transactionRepository.getAll(accountid);
     }
 
     @Override
-    public synchronized Transaction deposit (double amount, long accountid) throws RuntimeException {
+    public Transaction deposit (double amount, long accountid) throws InvalidTransactionException {
 
         LOG.info("deposit {} into account {}", amount, accountid);
         Account account = accountService.get(accountid);
 
-        if (amount <= 0)
-            throw new RuntimeException("Invalid amount");
+        Transaction transaction = new Transaction(TransactionType.DEPOSIT, amount, account);
+        transactionValidator.validate(transaction);
 
-        if (account == null)
-            throw new RuntimeException("Invalid account");
+        accountService.credit(amount, account);
 
-        Transaction transaction = new Transaction(TransactionType.DEPOSIT, amount, accountid);
-        transactionRepository.store(transaction);
-
-        account.sum(amount);
-        accountService.update(account);
-        transaction.setStatus(1);
+        store(transaction);
         return transaction;
     }
 
     @Override
-    public synchronized Transaction withdraw (double amount, long accountid) throws RuntimeException {
+    public Transaction withdraw (double amount, long accountid) throws InvalidTransactionException {
 
         LOG.info("withdraw {} from account {}", amount, accountid);
         Account account = accountService.get(accountid);
 
-        if (account == null)
-            throw new RuntimeException("Invalid account");
+        Transaction transaction = new Transaction(TransactionType.WITHDRAW, amount * -1, account);
+        transactionValidator.validate(transaction);
 
-        if (amount <= 0)
-            throw new RuntimeException("Invalid amount");
+        accountService.debit(amount, account);
 
-        if (account.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0)
-            throw new RuntimeException("Insufficient funds");
-
-        Transaction t = new Transaction(TransactionType.WITHDRAW, amount*-1, account.getId());
-        transactionRepository.store(t);
-
-        account.subtract(amount);
-        accountService.update(account);
-
-        t.setStatus(1);
-        return t;
+        store(transaction);
+        return transaction;
     }
 
     @Override
-    public synchronized Transaction[] transfer (double amount, long from, long to) throws RuntimeException {
+    public Transaction[] transfer (double amount, long from, long to) throws InvalidTransactionException {
 
         LOG.info("transfer {} from {} to {}", amount, from, to);
 
         Account orig = accountService.get(from);
         Account dest = accountService.get(to);
 
-        if (amount <= 0)
-            throw new RuntimeException("Invalid amount");
+        Transaction cashOut = new Transaction(TransactionType.TRANSFER_OUT, amount * -1, orig);
+        Transaction cashIn = new Transaction(TransactionType.TRANSFER_IN, amount, dest);
 
-        if (orig == null || dest == null || orig == dest)
-            throw new RuntimeException("Invalid transaction");
+        transactionValidator.validateTransfer(cashOut, cashIn);
 
-        if (orig.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0)
-            throw new RuntimeException("Insufficient funds");
+        accountService.debit(amount, orig);
+        accountService.credit(amount, dest);
 
-        Transaction in = new Transaction(TransactionType.TRANSFER_IN, amount * -1, from);
-        Transaction out = new Transaction(TransactionType.TRANSFER_OUT, amount, to);
-        transactionRepository.store(in);
-        transactionRepository.store(out);
+        store(cashOut, cashIn);
+        return new Transaction[] { cashIn, cashOut };
+    }
 
-        synchronized(orig) {
+    private void store (Transaction ... transactions) {
 
-            orig.subtract(amount);
-            accountService.update(orig);
-            out.setStatus(1);
+        for (Transaction t: transactions) {
+            t.setStatus(1);
+            transactionRepository.store(t);
         }
-        synchronized(dest) {
-
-            dest.sum(amount);
-            accountService.update(dest);
-            in.setStatus(1);
-        }
-        return new Transaction[] {in, out};
     }
 }
