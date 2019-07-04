@@ -40,7 +40,7 @@ curl -X POST http://localhost:8181/api/v1/accounts/:id/deposit/:amount
 ```
 *Withdraw*<br/>
 ```
-curl -X POST http://localhost:8181/api/v1/accounts/:id/:withdraw/:amount
+curl -X POST http://localhost:8181/api/v1/accounts/:id/withdraw/:amount
 ```
 *Transfer*<br/>
 ```
