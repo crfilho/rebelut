@@ -1,7 +1,10 @@
 package validator;
+import model.Account;
 import model.Transaction;
+import model.Transfer;
 
 public interface ITransactionValidator {
-    void validate(Transaction transaction) ;
-    void validateTransfer(Transaction origTransaction, Transaction destTransaction) ;
+    void validateAccount (Account account);
+    void validateTransfer (Transfer transfer);
+    void validateTransaction (Transaction transaction);
 }

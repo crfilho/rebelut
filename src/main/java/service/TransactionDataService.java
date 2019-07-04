@@ -3,11 +3,11 @@ import data.ITransactionRepository;
 import model.Account;
 import model.Transaction;
 import model.TransactionType;
+import model.Transfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import validator.ITransactionValidator;
 import validator.InvalidTransactionException;
-import validator.TransactionErrorMessage;
 
 import java.util.Collection;
 
@@ -33,22 +33,23 @@ public class TransactionDataService implements ITransactionDataService {
     public Collection<Transaction> getAll (long accountid) throws RuntimeException {
 
         LOG.info("getTransactions for account {}", accountid);
-        Account account = accountService.get(accountid);
 
-        if (account == null)
-            throw new InvalidTransactionException(TransactionErrorMessage.INVALID_ACCOUNT);
+        Account account = accountService.get(accountid);
+        transactionValidator.validateAccount(account);
 
         return transactionRepository.getAll(accountid);
     }
 
     @Override
-    public Transaction deposit (double amount, long accountid) throws InvalidTransactionException {
+    public synchronized Transaction deposit (double amount, long accountid) throws InvalidTransactionException {
 
         LOG.info("deposit {} into account {}", amount, accountid);
+
         Account account = accountService.get(accountid);
+        transactionValidator.validateAccount(account);
 
         Transaction transaction = new Transaction(TransactionType.DEPOSIT, amount, account);
-        transactionValidator.validate(transaction);
+        transactionValidator.validateTransaction(transaction);
 
         accountService.credit(amount, account);
 
@@ -57,13 +58,14 @@ public class TransactionDataService implements ITransactionDataService {
     }
 
     @Override
-    public Transaction withdraw (double amount, long accountid) throws InvalidTransactionException {
+    public synchronized Transaction withdraw (double amount, long accountid) throws InvalidTransactionException {
 
         LOG.info("withdraw {} from account {}", amount, accountid);
         Account account = accountService.get(accountid);
+        transactionValidator.validateAccount(account);
 
         Transaction transaction = new Transaction(TransactionType.WITHDRAW, amount * -1, account);
-        transactionValidator.validate(transaction);
+        transactionValidator.validateTransaction(transaction);
 
         accountService.debit(amount, account);
 
@@ -72,23 +74,24 @@ public class TransactionDataService implements ITransactionDataService {
     }
 
     @Override
-    public Transaction[] transfer (double amount, long from, long to) throws InvalidTransactionException {
+    public synchronized Transfer transfer (double amount, long from, long to) throws InvalidTransactionException {
 
         LOG.info("transfer {} from {} to {}", amount, from, to);
 
         Account orig = accountService.get(from);
+        transactionValidator.validateAccount(orig);
+
         Account dest = accountService.get(to);
+        transactionValidator.validateAccount(dest);
 
-        Transaction cashOut = new Transaction(TransactionType.TRANSFER_OUT, amount * -1, orig);
-        Transaction cashIn = new Transaction(TransactionType.TRANSFER_IN, amount, dest);
-
-        transactionValidator.validateTransfer(cashOut, cashIn);
+        Transfer transfer = new Transfer(amount, orig, dest);
+        transactionValidator.validateTransfer(transfer);
 
         accountService.debit(amount, orig);
         accountService.credit(amount, dest);
 
-        store(cashOut, cashIn);
-        return new Transaction[] { cashIn, cashOut };
+        store(transfer.getOrigTransaction(), transfer.getDestTransaction());
+        return transfer;
     }
 
     private void store (Transaction ... transactions) {

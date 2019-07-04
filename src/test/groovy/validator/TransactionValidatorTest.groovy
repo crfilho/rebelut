@@ -1,24 +1,25 @@
 package validator
 
 import model.Account
-import data.ITransactionRepository
 import model.Transaction
 import model.TransactionType
+import model.Transfer
 import spock.lang.Unroll
 import spock.lang.Specification
 
-public class BasicTransactionValidatorTest extends Specification {
+public class TransactionValidatorTest extends Specification {
 
-    def transactionValidator = new BasicTransactionValidator()
+    def transactionValidator = new TransactionValidator()
 
     @Unroll
     def "should validate single deposit request"() {
 
         given:
-        def transaction = new Transaction(TransactionType.DEPOSIT, 100d, new Account());
+        def account = new Account();
+        def transaction = new Transaction(TransactionType.DEPOSIT, 100d, account);
 
         when:
-        transactionValidator.validate(transaction);
+        transactionValidator.validateTransaction(transaction);
 
         then:
         noExceptionThrown()
@@ -27,11 +28,10 @@ public class BasicTransactionValidatorTest extends Specification {
     @Unroll
     def "should reject deposit because account is invalid"() {
 
-        given:
-        def transaction = new Transaction(TransactionType.DEPOSIT, 100d, null);
-
         when:
-        transactionValidator.validate(transaction);
+        def account = null
+        def transaction = new Transaction(TransactionType.DEPOSIT, 100d, account);
+        transactionValidator.validateTransaction(transaction);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -47,7 +47,7 @@ public class BasicTransactionValidatorTest extends Specification {
         def transaction = new Transaction(TransactionType.WITHDRAW, -20d, account);
 
         when:
-        transactionValidator.validate(transaction);
+        transactionValidator.validateTransaction(transaction);
 
         then:
         noExceptionThrown()
@@ -57,10 +57,11 @@ public class BasicTransactionValidatorTest extends Specification {
     def "should reject withdraw because account is invalid"() {
 
         given:
-        def transaction = new Transaction(TransactionType.WITHDRAW, -20d, null);
+        def account = null;
+        def transaction = new Transaction(TransactionType.WITHDRAW, -20d, account);
 
         when:
-        transactionValidator.validate(transaction);
+        transactionValidator.validateTransaction(transaction);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -74,7 +75,7 @@ public class BasicTransactionValidatorTest extends Specification {
         def transaction = new Transaction(TransactionType.WITHDRAW, -20d, account);
 
         when:
-        transactionValidator.validate(transaction);
+        transactionValidator.validateTransaction(transaction);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -87,11 +88,10 @@ public class BasicTransactionValidatorTest extends Specification {
         given:
         def account = new Account()
         account.sum(210d);
-        def origTransaction = new Transaction(TransactionType.TRANSFER_OUT, -200d, account);
-        def destTransaction = new Transaction(TransactionType.TRANSFER_IN, 200d, new Account());
+        def transfer = new Transfer(200, account, new Account())
 
         when:
-        transactionValidator.validateTransfer(origTransaction, destTransaction);
+        transactionValidator.validateTransfer(transfer);
 
         then:
         noExceptionThrown()
@@ -103,11 +103,10 @@ public class BasicTransactionValidatorTest extends Specification {
         given:
         def account = new Account()
         account.sum(210d);
-        def origTransaction = new Transaction(TransactionType.TRANSFER_OUT, -200d, account);
-        def destTransaction = new Transaction(TransactionType.TRANSFER_IN, 200d, null);
+        def transfer = new Transfer(200, account, null)
 
         when:
-        transactionValidator.validateTransfer(origTransaction, destTransaction);
+        transactionValidator.validateTransfer(transfer);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -118,11 +117,10 @@ public class BasicTransactionValidatorTest extends Specification {
     def "should reject single transfer because invalid origin account"() {
 
         given:
-        def origTransaction = new Transaction(TransactionType.TRANSFER_OUT, -200d, null);
-        def destTransaction = new Transaction(TransactionType.TRANSFER_IN, 200d, new Account());
+        def transfer = new Transfer(200, null, new Account())
 
         when:
-        transactionValidator.validateTransfer(origTransaction, destTransaction);
+        transactionValidator.validateTransfer(transfer);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -133,11 +131,10 @@ public class BasicTransactionValidatorTest extends Specification {
     def "should reject single transfer because invalid amount"() {
 
         given:
-        def origTransaction = new Transaction(TransactionType.WITHDRAW, 0, new Account());
-        def destTransaction = new Transaction(TransactionType.WITHDRAW, 0, new Account());
+        def transfer = new Transfer(-100, new Account(), new Account())
 
         when:
-        transactionValidator.validateTransfer(origTransaction, destTransaction);
+        transactionValidator.validateTransfer(transfer);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -148,11 +145,10 @@ public class BasicTransactionValidatorTest extends Specification {
     def "should reject single transfer because insufficient funds"() {
 
         given:
-        def origTransaction = new Transaction(TransactionType.TRANSFER_OUT, -100, new Account());
-        def destTransaction = new Transaction(TransactionType.TRANSFER_IN, 100, new Account());
+        def transfer = new Transfer(200, new Account(), new Account())
 
         when:
-        transactionValidator.validateTransfer(origTransaction, destTransaction);
+        transactionValidator.validateTransfer(transfer);
 
         then:
         def e = thrown(InvalidTransactionException)
@@ -164,12 +160,11 @@ public class BasicTransactionValidatorTest extends Specification {
 
         given:
         def account = new Account()
-        account.sum(110d);
-        def origTransaction = new Transaction(TransactionType.TRANSFER_OUT, -100, account);
-        def destTransaction = new Transaction(TransactionType.TRANSFER_IN, 100, account);
+        account.sum(210d);
+        def transfer = new Transfer(200, account, account)
 
         when:
-        transactionValidator.validateTransfer(origTransaction, destTransaction);
+        transactionValidator.validateTransfer(transfer);
 
         then:
         def e = thrown(InvalidTransactionException)
