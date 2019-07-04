@@ -1,4 +1,4 @@
-package validator;
+package validator.exceptions;
 
 public class InvalidTransactionException extends RuntimeException {
 

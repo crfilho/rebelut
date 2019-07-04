@@ -6,6 +6,8 @@ import model.TransactionType
 import model.Transfer
 import spock.lang.Unroll
 import spock.lang.Specification
+import validator.exceptions.ErrorMessages
+import validator.exceptions.InvalidTransactionException
 
 public class TransactionValidatorTest extends Specification {
 
@@ -26,19 +28,6 @@ public class TransactionValidatorTest extends Specification {
     }
 
     @Unroll
-    def "should reject deposit because account is invalid"() {
-
-        when:
-        def account = null
-        def transaction = new Transaction(TransactionType.DEPOSIT, 100d, account);
-        transactionValidator.validateTransaction(transaction);
-
-        then:
-        def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INVALID_ACCOUNT
-    }
-
-    @Unroll
     def "should validate single withdraw request with enough balance"() {
 
         given:
@@ -54,21 +43,6 @@ public class TransactionValidatorTest extends Specification {
     }
 
     @Unroll
-    def "should reject withdraw because account is invalid"() {
-
-        given:
-        def account = null;
-        def transaction = new Transaction(TransactionType.WITHDRAW, -20d, account);
-
-        when:
-        transactionValidator.validateTransaction(transaction);
-
-        then:
-        def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INVALID_ACCOUNT
-    }
-
-    @Unroll
     def "should validate withdraw because of insufficient funds"() {
         given:
         Account account = new Account();
@@ -79,7 +53,7 @@ public class TransactionValidatorTest extends Specification {
 
         then:
         def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INSUFFICIENT_FUNDS
+        e.message == ErrorMessages.INSUFFICIENT_FUNDS
     }
 
     @Unroll
@@ -98,36 +72,6 @@ public class TransactionValidatorTest extends Specification {
     }
 
     @Unroll
-    def "should reject single transfer because invalid destination account"() {
-
-        given:
-        def account = new Account()
-        account.sum(210d);
-        def transfer = new Transfer(200, account, null)
-
-        when:
-        transactionValidator.validateTransfer(transfer);
-
-        then:
-        def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INVALID_DEST_ACCOUNT
-    }
-
-    @Unroll
-    def "should reject single transfer because invalid origin account"() {
-
-        given:
-        def transfer = new Transfer(200, null, new Account())
-
-        when:
-        transactionValidator.validateTransfer(transfer);
-
-        then:
-        def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INVALID_ORIG_ACCOUNT
-    }
-
-    @Unroll
     def "should reject single transfer because invalid amount"() {
 
         given:
@@ -138,7 +82,7 @@ public class TransactionValidatorTest extends Specification {
 
         then:
         def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INVALID_AMOUNT
+        e.message == ErrorMessages.INVALID_AMOUNT
     }
 
     @Unroll
@@ -152,7 +96,7 @@ public class TransactionValidatorTest extends Specification {
 
         then:
         def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INSUFFICIENT_FUNDS
+        e.message == ErrorMessages.INSUFFICIENT_FUNDS
     }
 
     @Unroll
@@ -168,6 +112,6 @@ public class TransactionValidatorTest extends Specification {
 
         then:
         def e = thrown(InvalidTransactionException)
-        e.message == TransactionErrorMessage.INVALID_TRANSACTION
+        e.message == ErrorMessages.INVALID_TRANSACTION
     }
 }

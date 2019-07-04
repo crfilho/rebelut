@@ -1,6 +1,6 @@
-package validator;
+package validator.exceptions;
 
-public class TransactionErrorMessage {
+public class ErrorMessages {
     public static final String INVALID_AMOUNT = "Invalid amount";
     public static final String INVALID_ACCOUNT = "Invalid account";
     public static final String INVALID_ORIG_ACCOUNT = "Invalid origin account";

@@ -3,9 +3,11 @@ import data.IAccountRepository;
 import model.Account;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import validator.exceptions.InvalidAccountException;
 
 public class AccountDataService implements IAccountDataService {
 
@@ -21,7 +23,12 @@ public class AccountDataService implements IAccountDataService {
     public Account get(long id) {
 
         LOG.info("account.get {}", id);
-        return accountRepository.get(id);
+        Optional<Account> account = accountRepository.get(id);
+
+        if (account.isPresent())
+            return account.get();
+        else
+            throw new InvalidAccountException();
     }
 
     @Override

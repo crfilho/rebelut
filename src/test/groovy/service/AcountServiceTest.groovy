@@ -3,6 +3,8 @@ package service
 import data.IAccountRepository
 import spock.lang.Unroll
 import spock.lang.Specification
+import validator.exceptions.ErrorMessages
+import validator.exceptions.InvalidAccountException
 
 public class AcountServiceTest extends Specification {
 
@@ -83,6 +85,19 @@ public class AcountServiceTest extends Specification {
 
         then:
         1 * accountRepoMock.getAll()
+    }
+
+    @Unroll
+    def "should throw InvalidAccount when account is not found"() {
+        given:
+        accountRepoMock.get(4040L) >> Optional.empty()
+
+        when:
+        accountService.get(4040L)
+
+        then:
+        def e = thrown(InvalidAccountException)
+        e.message == ErrorMessages.INVALID_ACCOUNT
     }
 
 }

@@ -2,10 +2,11 @@ package data;
 import model.Account;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface IAccountRepository {
 
-    Account get(long id);
+    Optional<Account> get(long id);
     Collection<Account> getAll();
     void create(Account account);
     void update(Account account);

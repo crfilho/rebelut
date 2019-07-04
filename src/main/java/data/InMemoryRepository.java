@@ -4,6 +4,7 @@ import model.Transaction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryRepository implements IAccountRepository, ITransactionRepository {
@@ -19,8 +20,8 @@ public class InMemoryRepository implements IAccountRepository, ITransactionRepos
     }
 
     @Override
-    public Account get(long id) {
-        return ACCOUNT_CACHE.get(id);
+    public Optional<Account> get(long id) {
+        return Optional.ofNullable(ACCOUNT_CACHE.get(id));
     }
 
     @Override

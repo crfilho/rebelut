@@ -18,24 +18,42 @@ public class AccountController {
     }
 
     public Handler get = ctx -> {
-        long id = Long.valueOf(ctx.pathParam("id"));
-        Account a = accountService.get(id);
-        if (a != null) ctx.json(a);
-        else ctx.status(404);
+        try {
+            long id = Long.valueOf(ctx.pathParam("id"));
+            ctx.json(accountService.get(id));
+        }
+        catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 
     public Handler getAll = ctx -> {
-        ctx.json(accountService.getAll());
+        try {
+            ctx.json(accountService.getAll());
+        }
+        catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 
     public Handler create = ctx -> {
-        Account acc = accountService.create();
-        ctx.status(201).json(acc);
+        try {
+            Account acc = accountService.create();
+            ctx.status(201).json(acc);
+        }
+            catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 
     public Handler delete = ctx -> {
-        long id = Long.valueOf(ctx.pathParam("id"));
-        accountService.delete(id);
-        ctx.status(200);
+        try {
+            long id = Long.valueOf(ctx.pathParam("id"));
+            accountService.delete(id);
+            ctx.status(200);
+        }
+        catch(Exception e) {
+            ctx.status(400).json(e.getMessage());
+        }
     };
 }
