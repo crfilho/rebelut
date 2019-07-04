@@ -8,8 +8,8 @@ public class Transfer {
     private Transaction destTransaction;
 
     public Transfer(double amount, Account origAccount, Account destAccount) {
-        //this.origAccountId = origAccount.getId();
-        //this.destAccountId = destAccount.getId();
+        this.origAccountId = origAccount.getId();
+        this.destAccountId = destAccount.getId();
 
         origTransaction = new Transaction(TransactionType.TRANSFER_OUT, amount * -1, origAccount);
         destTransaction = new Transaction(TransactionType.TRANSFER_IN, amount, destAccount);

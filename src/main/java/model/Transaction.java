@@ -9,18 +9,18 @@ public class Transaction {
     private String id;
     private double sum;
     private long accountid;
-    private TransactionType txType;
+    private TransactionType type;
     private int status;
-    private Instant time;
+    private String time;
     private transient Account account;
 
-    public Transaction(TransactionType txType, double sum, Account account) {
+    public Transaction(TransactionType type, double sum, Account account) {
 
         this.id = genTxID();
-        this.txType = txType;
+        this.type = type;
         this.account = account;
-        //this.accountid = account?.getId();
-        this.time = Instant.now();
+        this.accountid = account.getId();
+        this.time = Instant.now().toString();
         this.sum = sum;
         this.setStatus(0);
     }
@@ -37,7 +37,7 @@ public class Transaction {
         return account.getId();
     }
 
-    public Instant getTime() {
+    public String getTime() {
         return time;
     }
 
@@ -45,22 +45,13 @@ public class Transaction {
         return status;
     }
 
-    public String getTest() {
-        return "BLABLA";
-    }
-
     public void setStatus(int status) {
         this.status = status;
     }
 
-    public TransactionType getTxType() {
-        return txType;
+    public TransactionType getType() {
+        return type;
     }
-
-    public void setTxType(TransactionType txType) {
-        this.txType = txType;
-    }
-
     public Account getAccount() { return account; }
 
     @Override
@@ -82,21 +73,21 @@ public class Transaction {
 
     public boolean isWithdraw() {
 
-        return this.txType.equals(TransactionType.WITHDRAW);
+        return this.getType().equals(TransactionType.WITHDRAW);
     }
 
     public boolean isDeposit() {
 
-        return this.txType.equals(TransactionType.DEPOSIT);
+        return this.getType().equals(TransactionType.DEPOSIT);
     }
 
     public boolean isTransferIn() {
 
-        return this.txType.equals(TransactionType.TRANSFER_IN);
+        return this.getType().equals(TransactionType.TRANSFER_IN);
     }
 
     public boolean isTransferOut() {
 
-        return this.txType.equals(TransactionType.TRANSFER_OUT);
+        return this.getType().equals(TransactionType.TRANSFER_OUT);
     }
 }

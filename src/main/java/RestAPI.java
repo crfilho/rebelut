@@ -11,10 +11,12 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.apibuilder.ApiBuilder.delete;
+import static io.javalin.apibuilder.ApiBuilder.before;
 import static io.javalin.apibuilder.ApiBuilder.after;
 
 public class RestAPI {
 
+    private static String servicename = "rebelut";
     private static String endpoint = "/api/v1/";
     private static int port = 8181;
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -45,6 +47,7 @@ public class RestAPI {
     private void setupRouting()
     {
         app.routes(() -> {
+            before(ctx -> ctx.header("Server", servicename));
             path(endpoint, () -> {
                 path("accounts", () -> {
                     get(accountController.getAll);
