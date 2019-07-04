@@ -33,7 +33,7 @@ public class Transaction {
     }
 
     public long getAccountId() {
-        return account.getId();
+        return accountid;
     }
 
     public String getTime() {
