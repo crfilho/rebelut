@@ -36,6 +36,6 @@ public class AccountController {
     public Handler delete = ctx -> {
         long id = Long.valueOf(ctx.pathParam("id"));
         accountService.delete(id);
-        ctx.status(204);
+        ctx.status(200);
     };
 }

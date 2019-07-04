@@ -1,6 +1,7 @@
 package controller;
 import model.Account;
 import model.Transaction;
+import model.Transfer;
 import service.IAccountDataService;
 import service.ITransactionDataService;
 import io.javalin.http.Handler;
@@ -20,7 +21,7 @@ public class TransactionController {
             long accountid = Long.valueOf(ctx.pathParam("accountid"));
             double sum = ctx.pathParam("sum", double.class).check(it -> it > 0).get();
 
-            ctx.json(transactionService.deposit(sum, accountid));
+            ctx.status(200).json(transactionService.deposit(sum, accountid));
         }
         catch(Exception e) {
             ctx.status(400).json(e.getMessage());
@@ -32,7 +33,7 @@ public class TransactionController {
             long accountid = Long.valueOf(ctx.pathParam("accountid"));
             double sum = ctx.pathParam("sum", double.class).check(it -> it > 0).get();
 
-            ctx.json(transactionService.withdraw(sum, accountid));
+            ctx.status(200).json(transactionService.withdraw(sum, accountid));
         }
         catch(Exception e) {
             ctx.status(400).json(e.getMessage());
@@ -46,9 +47,12 @@ public class TransactionController {
             long to = Long.valueOf(ctx.formParam("to"));
             double sum = ctx.formParam("sum", double.class).check(it -> it > 0).get();
 
-            Transaction[] tx = transactionService.transfer(sum, from, to);
-            if (tx[0].getStatus() < 0 || tx[1].getStatus() < 0) ctx.status(403).json(tx);
-            else ctx.status(200).json(tx);
+            //Transfer transfer = ctx.bodyAsClass(Transfer.class);
+            Transfer transfer = transactionService.transfer(sum, from, to);
+            if (transfer.getOrigTransaction().getStatus() <= 0 || transfer.getDestTransaction().getStatus() <= 0)
+                ctx.status(403).json(transfer);
+            else
+                ctx.status(200).json(transfer);
         }
         catch(Exception e) {
             ctx.status(400).json(e.getMessage());

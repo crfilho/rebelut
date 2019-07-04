@@ -3,13 +3,14 @@ import model.Account;
 import model.Transaction;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryRepository implements IAccountRepository, ITransactionRepository {
 
     private static InMemoryRepository instance = new InMemoryRepository();
-    private static final ConcurrentHashMap<Long, Account> ACCOUNT_CACHE = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Long, Account> ACCOUNT_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Long, Collection<Transaction>> TX_CACHE = new ConcurrentHashMap<>();
 
     private InMemoryRepository() { }
 
@@ -37,7 +38,7 @@ public class InMemoryRepository implements IAccountRepository, ITransactionRepos
     @Override
     public void update(Account account) {
 
-        ACCOUNT_CACHE.put(account.getId(), account);
+        return;
     }
 
     @Override
@@ -49,12 +50,12 @@ public class InMemoryRepository implements IAccountRepository, ITransactionRepos
     @Override
     public void store (Transaction transaction) {
 
-        Collection<Transaction> transactions = TX_CACHE.containsKey(transaction.getAccount().getId())
-                ? TX_CACHE.get(transaction.getAccount().getId())
+        Collection<Transaction> transactions = TX_CACHE.containsKey(transaction.getAccountId())
+                ? TX_CACHE.get(transaction.getAccountId())
                 : new ArrayList<>();
 
         transactions.add(transaction);
-        TX_CACHE.put(transaction.getAccount().getId(), transactions);
+        TX_CACHE.put(transaction.getAccountId(), transactions);
     }
 
     @Override
