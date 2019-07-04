@@ -4,11 +4,11 @@ import model.Account;
 import model.Transaction;
 import model.TransactionType;
 import model.Transfer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import validator.ITransactionValidator;
 import validator.exceptions.InvalidAccountException;
 import validator.exceptions.InvalidTransactionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 

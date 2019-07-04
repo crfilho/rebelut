@@ -1,13 +1,11 @@
 package service;
 import data.IAccountRepository;
 import model.Account;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import validator.exceptions.InvalidAccountException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import validator.exceptions.InvalidAccountException;
+import java.util.Collection;
+import java.util.Optional;
 
 public class AccountDataService implements IAccountDataService {
 

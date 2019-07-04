@@ -1,5 +1,6 @@
 package service;
 import model.Account;
+
 import java.util.Collection;
 
 public interface IAccountDataService {

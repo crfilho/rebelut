@@ -1,9 +1,7 @@
 package validator;
-import model.Account;
 import model.Transaction;
 import model.Transfer;
 import validator.exceptions.ErrorMessages;
-import validator.exceptions.InvalidAccountException;
 import validator.exceptions.InvalidTransactionException;
 
 import java.math.BigDecimal;
@@ -24,9 +22,7 @@ public class TransactionValidator implements ITransactionValidator {
     public void validateTransaction (Transaction transaction) throws InvalidTransactionException {
 
         validateAmount (transaction);
-
-        if (transaction.isWithdraw() || transaction.isTransferOut())
-            validateBalance(transaction);
+        validateBalance(transaction);
     }
 
     private void validateAmount (Transaction transaction) {
@@ -45,12 +41,13 @@ public class TransactionValidator implements ITransactionValidator {
 
     private void validateBalance (Transaction transaction) throws InvalidTransactionException {
 
-        Account account = transaction.getAccount();
+        if (transaction.isWithdraw() || transaction.isTransferOut()) {
 
-        BigDecimal balance = account.getBalance();
-        BigDecimal sum = BigDecimal.valueOf(Math.abs(transaction.getSum()));
+            BigDecimal balance = transaction.getAccount().getBalance();
+            BigDecimal sum = BigDecimal.valueOf(Math.abs(transaction.getSum()));
 
-        if (balance.compareTo(sum) < 0)
-            throw new InvalidTransactionException(ErrorMessages.INSUFFICIENT_FUNDS);
+            if (balance.compareTo(sum) < 0)
+                throw new InvalidTransactionException(ErrorMessages.INSUFFICIENT_FUNDS);
+        }
     }
 }

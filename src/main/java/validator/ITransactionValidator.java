@@ -1,5 +1,4 @@
 package validator;
-import model.Account;
 import model.Transaction;
 import model.Transfer;
 

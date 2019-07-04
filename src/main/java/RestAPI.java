@@ -1,9 +1,9 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import controller.AccountController;
 import controller.TransactionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.javalin.Javalin;
 import io.javalin.plugin.json.JavalinJson;
 

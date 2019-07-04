@@ -1,11 +1,10 @@
-package validator
+package service
 
 import model.Account
 import data.ITransactionRepository
-import service.IAccountDataService
-import service.TransactionDataService
 import spock.lang.Unroll
 import spock.lang.Specification
+import validator.ITransactionValidator
 
 public class TransactionServiceTest extends Specification {
 
