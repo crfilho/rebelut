@@ -4,35 +4,26 @@ apply plugin: "groovy"
 version '1.0'
 sourceCompatibility = 1.8
 
-task buildit(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title':  project.name,
-                'Implementation-Version': version,
-                'Main-Class': 'App'
-    }
-    baseName = project.name
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-jar {
-    baseName = project.name
-    version = version
-}
-
-test {
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     compile 'com.google.code.gson:gson:2.8.5'
-    compile "org.slf4j:slf4j-simple:1.7.26"
+    compile 'org.slf4j:slf4j-simple:1.7.26'
     compile 'io.javalin:javalin:3.1.0'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+}
+
+jar {
+    baseName = project.name
+    version = version
+    manifest {
+        attributes(
+            'Implementation-Title':  project.name,
+            'Implementation-Version': version,
+            'Main-Class': 'App'
+        )
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

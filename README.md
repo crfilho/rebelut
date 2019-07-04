@@ -4,15 +4,15 @@
 
 **Build**<br/>
 ```
-gradle buildit
+./gradlew build
 ```
 **Test**<br/>
 ```
-gradle test
+./gradlew test
 ```
 **Run**<br/>
 ```
-java -jar build\\libs\\rebelut-1.0.jar
+java -jar build/libs/rebelut-1.0.jar
 ```
 *Create new account*<br/>
 ```
