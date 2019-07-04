@@ -42,7 +42,6 @@ public class TransactionController {
             long to = Long.valueOf(ctx.formParam("to"));
             double sum = ctx.formParam("sum", double.class).check(it -> it > 0).get();
 
-            //Transfer transfer = ctx.bodyAsClass(Transfer.class);
             Transfer transfer = transactionService.transfer(sum, from, to);
             if (transfer.getOrigTransaction().getStatus() <= 0 || transfer.getDestTransaction().getStatus() <= 0)
                 ctx.status(403).json(transfer);
